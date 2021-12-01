@@ -18,6 +18,11 @@ public class Main {
         for (int i = 0; i < graphs.length; i++) {
             graphs[i] = new Graph(matrices.getUniqueElements(), matrices.getElements(), groups.getGroups().get(i));
         }
+        Module module = new Module(graphs[0]);
+        ArrayList<ArrayList<String>> myModule = module.getModule();
+        for (int i = 0; i < myModule.size(); i++) {
+            System.out.println(myModule.get(i));
+        }
     }
 
 
