@@ -13,14 +13,14 @@ public final class Groups {
         this.groupAdjacencyMatrix = createGroupAdjacencyMatrix(groups, matrices.getAdjacencyMatrix());
         this.groups = sortByOperationAmount(groupAdjacencyMatrix);
         System.out.println("Groups");
-        for (int i = 0; i < groups.size(); i++) {
-            System.out.println(groups.get(i));
+        for (ArrayList<Integer> group : groups) {
+            System.out.println(group);
         }
         System.out.println();
         System.out.println("Refined group");
         groupRefinement(matrices.getAdjacencyMatrix());
-        for (int i = 0; i < groups.size(); i++) {
-            System.out.println(groups.get(i));
+        for (ArrayList<Integer> group : groups) {
+            System.out.println(group);
         }
         this.groupAdjacencyMatrix = createGroupAdjacencyMatrix(groups, matrices.getAdjacencyMatrix());
 
@@ -112,9 +112,7 @@ public final class Groups {
         for (int i = 0; i < groups.size(); i++) {
             if (groups.get(i).size() > 0) {
                 combinedGroup = combineOperationsIntoGroup(groups.get(i), adjacencyMatrix);
-                for (int j = 0; j < groupAdjacencyMatrix[i].length; j++) {
-                    groupAdjacencyMatrix[i][j] = combinedGroup[j];
-                }
+                System.arraycopy(combinedGroup, 0, groupAdjacencyMatrix[i], 0, groupAdjacencyMatrix[i].length);
             }
 
         }
@@ -137,10 +135,10 @@ public final class Groups {
 
     private static int[] combineOperationsIntoGroup(ArrayList<Integer> group, int[][] adjacencyMatrix) {
         int[] groupOperations = new int[adjacencyMatrix[group.get(0)].length];
-        for (int i = 0; i < group.size(); i++) {
-            for (int j = 0; j < adjacencyMatrix[group.get(i)].length; j++) {
-                if (adjacencyMatrix[group.get(i)][j] == 1) {
-                    groupOperations[j] = adjacencyMatrix[group.get(i)][j];
+        for (Integer groupOperation : group) {
+            for (int j = 0; j < adjacencyMatrix[groupOperation].length; j++) {
+                if (adjacencyMatrix[groupOperation][j] == 1) {
+                    groupOperations[j] = adjacencyMatrix[groupOperation][j];
                 }
             }
         }
@@ -166,31 +164,31 @@ public final class Groups {
             quadraticMatrix[maxElementCoordinates[0]][maxElementCoordinates[1]] = 0;
             // clear vertical and horizontal lines on maxElem[0] and maxElem[1]
             // horizontal lines on i j
-            for (int j = 0; j < maxElementCoordinates.length; j++) {
-                for (int i = 0; quadraticMatrix[maxElementCoordinates[j]][i] != -1; i++) {
-                    if (quadraticMatrix[maxElementCoordinates[j]][i] == maxElement) {
+            for (int maxElementCoordinate : maxElementCoordinates) {
+                for (int i = 0; quadraticMatrix[maxElementCoordinate][i] != -1; i++) {
+                    if (quadraticMatrix[maxElementCoordinate][i] == maxElement) {
                         numberCoordinates.add(new ArrayList<>());
-                        numberCoordinates.get(numberCoordinates.size() - 1).add(maxElementCoordinates[j]);
+                        numberCoordinates.get(numberCoordinates.size() - 1).add(maxElementCoordinate);
                         numberCoordinates.get(numberCoordinates.size() - 1).add(i);
-                        subgroups.add(maxElementCoordinates[j]);
+                        subgroups.add(maxElementCoordinate);
                         subgroups.add(i);
 
                     } else {
-                        quadraticMatrix[maxElementCoordinates[j]][i] = 0;
+                        quadraticMatrix[maxElementCoordinate][i] = 0;
                     }
                 }
             }
             // vertical lines i j
-            for (int j = 0; j < maxElementCoordinates.length; j++) {
-                for (int i = quadraticMatrix.length - 1; quadraticMatrix[i][maxElementCoordinates[j]] != -1; i--) {
-                    if (quadraticMatrix[i][maxElementCoordinates[j]] == maxElement) {
+            for (int maxElementCoordinate : maxElementCoordinates) {
+                for (int i = quadraticMatrix.length - 1; quadraticMatrix[i][maxElementCoordinate] != -1; i--) {
+                    if (quadraticMatrix[i][maxElementCoordinate] == maxElement) {
                         numberCoordinates.add(new ArrayList<>());
                         numberCoordinates.get(numberCoordinates.size() - 1).add(i);
-                        numberCoordinates.get(numberCoordinates.size() - 1).add(maxElementCoordinates[j]);
+                        numberCoordinates.get(numberCoordinates.size() - 1).add(maxElementCoordinate);
                         subgroups.add(i);
-                        subgroups.add(maxElementCoordinates[j]);
+                        subgroups.add(maxElementCoordinate);
                     } else {
-                        quadraticMatrix[i][maxElementCoordinates[j]] = 0;
+                        quadraticMatrix[i][maxElementCoordinate] = 0;
                     }
                 }
             }
@@ -202,31 +200,31 @@ public final class Groups {
                 numberCoordinates.remove(j);
                 // clear vertical and horizontal lines on maxElem[0] and maxElem[1]
                 // horizontal lines on i j
-                for (int k = 0; k < maxElementCoordinates.length; k++) {
-                    for (int i = 0; quadraticMatrix[maxElementCoordinates[k]][i] != -1; i++) {
-                        if (quadraticMatrix[maxElementCoordinates[k]][i] == maxElement) {
+                for (int maxElementCoordinate : maxElementCoordinates) {
+                    for (int i = 0; quadraticMatrix[maxElementCoordinate][i] != -1; i++) {
+                        if (quadraticMatrix[maxElementCoordinate][i] == maxElement) {
                             numberCoordinates.add(new ArrayList<>());
-                            numberCoordinates.get(numberCoordinates.size() - 1).add(maxElementCoordinates[k]);
+                            numberCoordinates.get(numberCoordinates.size() - 1).add(maxElementCoordinate);
                             numberCoordinates.get(numberCoordinates.size() - 1).add(i);
-                            subgroups.add(maxElementCoordinates[k]);
+                            subgroups.add(maxElementCoordinate);
                             subgroups.add(i);
 
                         } else {
-                            quadraticMatrix[maxElementCoordinates[k]][i] = 0;
+                            quadraticMatrix[maxElementCoordinate][i] = 0;
                         }
                     }
                 }
                 // vertical lines i j
-                for (int k = 0; k < maxElementCoordinates.length; k++) {
-                    for (int i = quadraticMatrix.length - 1; quadraticMatrix[i][maxElementCoordinates[k]] != -1; i--) {
-                        if (quadraticMatrix[i][maxElementCoordinates[k]] == maxElement) {
+                for (int maxElementCoordinate : maxElementCoordinates) {
+                    for (int i = quadraticMatrix.length - 1; quadraticMatrix[i][maxElementCoordinate] != -1; i--) {
+                        if (quadraticMatrix[i][maxElementCoordinate] == maxElement) {
                             numberCoordinates.add(new ArrayList<>());
                             numberCoordinates.get(numberCoordinates.size() - 1).add(i);
-                            numberCoordinates.get(numberCoordinates.size() - 1).add(maxElementCoordinates[k]);
+                            numberCoordinates.get(numberCoordinates.size() - 1).add(maxElementCoordinate);
                             subgroups.add(i);
-                            subgroups.add(maxElementCoordinates[k]);
+                            subgroups.add(maxElementCoordinate);
                         } else {
-                            quadraticMatrix[i][maxElementCoordinates[k]] = 0;
+                            quadraticMatrix[i][maxElementCoordinate] = 0;
                         }
                     }
                 }
@@ -239,10 +237,8 @@ public final class Groups {
 
     private static ArrayList<ArrayList<Integer>> addOperations(ArrayList<ArrayList<Integer>> groups) {
         List<Integer> allGroups = new ArrayList<>();
-        for (int i = 0; i < groups.size(); i++) {
-            for (int j = 0; j < groups.get(i).size(); j++) {
-                allGroups.add(groups.get(i).get(j));
-            }
+        for (ArrayList<Integer> group : groups) {
+            allGroups.addAll(group);
         }
         List<Integer> sortedGroups = allGroups.stream().sorted().collect(Collectors.toList());
         int counter = 0;
