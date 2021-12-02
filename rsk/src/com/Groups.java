@@ -1,15 +1,23 @@
 package rsk.src.com;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public final class Groups {
 
     private ArrayList<ArrayList<Integer>> groups;
     private int[][] groupAdjacencyMatrix;
+    private final ArrayList<String> uniqueElements;
+
+    // TODO: need to fix sortByOperationAmount method
+
 
     public Groups(MatrixContainer matrices) {
+        this.uniqueElements = matrices.getUniqueElements();
         this.groups = divideByGroups(matrices.getQuadraticMatrix());
+        System.out.println("BEFORE SORT");
+        for (ArrayList<Integer> group : groups) {
+            System.out.println(group);
+        }
         this.groupAdjacencyMatrix = createGroupAdjacencyMatrix(groups, matrices.getAdjacencyMatrix());
         this.groups = sortByOperationAmount(groupAdjacencyMatrix);
         System.out.println("Groups");
@@ -22,11 +30,12 @@ public final class Groups {
         for (ArrayList<Integer> group : groups) {
             System.out.println(group);
         }
+        System.out.println();
         this.groupAdjacencyMatrix = createGroupAdjacencyMatrix(groups, matrices.getAdjacencyMatrix());
 
     }
 
-    // sort group adjacencyMatrix
+
     private void groupRefinement(int[][] adjacencyMatrix) {
         ArrayList<ArrayList<Integer>> refinedGroups = new ArrayList<>(groups.size());
         for (int i = 0; i < groups.size(); i++) {
@@ -35,21 +44,14 @@ public final class Groups {
         for (int i = 0; i < groups.size(); i++) {
             for (int j = i + 1; j < groups.size(); j++) {
                 if (isGroupAbsorbsAnotherGroup(groupAdjacencyMatrix[i], groupAdjacencyMatrix[j])) {
-//                    System.out.println("Absorber" + groups.get(i));
                     groups.get(i).addAll(groups.get(j));
-//                    System.out.println("After absorb" + groups.get(i));
-//                    System.out.println("Before remove: " + groups.get(j));
                     groups.remove(groups.get(j));
                     break;
                 } else {
                     for (int k = 0; k < groups.get(j).size(); k++) {
                         if (isGroupAbsorbsAnotherGroup(groupAdjacencyMatrix[i], adjacencyMatrix[groups.get(j).get(k)])) {
-//                            System.out.println("Absorber " + groups.get(i));
-//                            System.out.println("Group that is being checked " + groups.get(j));
-//                            System.out.println("Operation to absorb " + groups.get(j).get(k));
                             groups.get(i).add(groups.get(j).get(k));
                             refinedGroups.get(i).add(groups.get(j).get(k));
-//                            System.out.println("After absorb " + refinedGroups.get(i));
                             groups.get(j).remove(k);
                             k--;
                         }
@@ -58,18 +60,36 @@ public final class Groups {
             }
         }
     }
-
+    // TODO fix this method (deletes some operations somehow)
+    /*
+    before sort
+        Groups
+        [5, 0]
+        [3, 1]
+        [4, 2]
+        [6]
+    after sort
+        Groups
+        [5, 0]
+        [3, 1]
+        [4, 2]
+        []
+     */
     private ArrayList<ArrayList<Integer>> sortByOperationAmount(int[][] groupAdjacencyMatrix) {
-        ArrayList<ArrayList<Integer>> sortedGroups = new ArrayList<>(groupAdjacencyMatrix.length);
+        ArrayList<ArrayList<Integer>> sortedGroups = new ArrayList<>(groups.size());
         int[][] groupMatrix = new int[groupAdjacencyMatrix.length][groupAdjacencyMatrix[0].length];
-        for (int i = 0; i < groupAdjacencyMatrix.length; i++) {
+        for (int i = 0; i < groups.size(); i++) {
             sortedGroups.add(new ArrayList<>());
         }
+        for (int i = 0; i < groupAdjacencyMatrix.length; i++) {
+            System.out.println(Arrays.toString(groupAdjacencyMatrix[i]));
+        }
         int[] zeroAmountInEachGroup = countZerosInGroups(groupAdjacencyMatrix);
+        System.out.println(Arrays.toString(zeroAmountInEachGroup) + "kekes");
         int indexContainer;
         for (int i = 0; i < zeroAmountInEachGroup.length; i++) {
             indexContainer = findIndexOfLowestElement(zeroAmountInEachGroup);
-            if (zeroAmountInEachGroup[indexContainer] != zeroAmountInEachGroup.length) {
+            if (zeroAmountInEachGroup[indexContainer] != groupAdjacencyMatrix[0].length) {
                 sortedGroups.get(i).addAll(groups.get(indexContainer));
                 zeroAmountInEachGroup[indexContainer] = zeroAmountInEachGroup.length;
                 groupMatrix[i] = groupAdjacencyMatrix[indexContainer];
@@ -96,7 +116,7 @@ public final class Groups {
 
     private static int findIndexOfLowestElement(int[] zeroAmountInEachGroup) {
         int index = 0;
-        int lowestElement = zeroAmountInEachGroup.length;
+        int lowestElement = zeroAmountInEachGroup[0];
         for (int i = 0; i < zeroAmountInEachGroup.length; i++) {
             if (zeroAmountInEachGroup[i] < lowestElement) {
                 index = i;
@@ -110,10 +130,8 @@ public final class Groups {
         int[][] groupAdjacencyMatrix = new int[groups.size()][adjacencyMatrix[0].length];
         int[] combinedGroup;
         for (int i = 0; i < groups.size(); i++) {
-            if (groups.get(i).size() > 0) {
-                combinedGroup = combineOperationsIntoGroup(groups.get(i), adjacencyMatrix);
-                System.arraycopy(combinedGroup, 0, groupAdjacencyMatrix[i], 0, groupAdjacencyMatrix[i].length);
-            }
+            combinedGroup = combineOperationsIntoGroup(groups.get(i), adjacencyMatrix);
+            System.arraycopy(combinedGroup, 0, groupAdjacencyMatrix[i], 0, groupAdjacencyMatrix[i].length);
 
         }
         return groupAdjacencyMatrix;
@@ -134,38 +152,38 @@ public final class Groups {
     }
 
     private static int[] combineOperationsIntoGroup(ArrayList<Integer> group, int[][] adjacencyMatrix) {
-        int[] groupOperations = new int[adjacencyMatrix[group.get(0)].length];
-        for (Integer groupOperation : group) {
-            for (int j = 0; j < adjacencyMatrix[groupOperation].length; j++) {
-                if (adjacencyMatrix[groupOperation][j] == 1) {
-                    groupOperations[j] = adjacencyMatrix[groupOperation][j];
+        int[] groupOperations = new int[adjacencyMatrix[0].length];
+        for (int i = 0; i < group.size(); i++) {
+            for (int j = 0; j < adjacencyMatrix[group.get(i)].length; j++) {
+                if (adjacencyMatrix[group.get(i)][j] == 1) {
+                    groupOperations[j] = 1;
                 }
             }
         }
         return groupOperations;
     }
 
-    private static ArrayList<ArrayList<Integer>> divideByGroups(int[][] quadraticMatrix) {
-
+    private ArrayList<ArrayList<Integer>> divideByGroups(int[][] quadraticMatrix) {
         ArrayList<ArrayList<Integer>> groups = new ArrayList<>(quadraticMatrix.length);
-
-        while (true) {
+        LinkedHashSet<Integer> subgroups;
+        int[] maxElementCoordinates = findMaxElementCoordinates(quadraticMatrix);
+        int maxElement = quadraticMatrix[maxElementCoordinates[0]][maxElementCoordinates[1]];
+        while (maxElement != 0) {
             ArrayList<ArrayList<Integer>> numberCoordinates = new ArrayList<>();
-            LinkedHashSet<Integer> subgroups = new LinkedHashSet<>(quadraticMatrix.length);
+            subgroups = new LinkedHashSet<>(quadraticMatrix.length);
             // find max element
-            int[] maxElementCoordinates = findMaxElementCoordinates(quadraticMatrix);
-            int maxElement = quadraticMatrix[maxElementCoordinates[0]][maxElementCoordinates[1]];
-            if (maxElement == 0) {
-
-                return addOperations(groups);
-            }
             subgroups.add(maxElementCoordinates[0]);
             subgroups.add(maxElementCoordinates[1]);
+            // mark as visited
             quadraticMatrix[maxElementCoordinates[0]][maxElementCoordinates[1]] = 0;
-            // clear vertical and horizontal lines on maxElem[0] and maxElem[1]
-            // horizontal lines on i j
+            /* clear vertical and horizontal lines on maxElem[0] and maxElem[1]
+            * horizontal lines on i j
+            * if we found another cell with the max number -> we add it into the list (numberCoordinate)
+            * or just mark current cell as visited (just assign zero to this cell)
+            */
             for (int maxElementCoordinate : maxElementCoordinates) {
                 for (int i = 0; quadraticMatrix[maxElementCoordinate][i] != -1; i++) {
+                    // found another cell with the max number -> we add it into the list
                     if (quadraticMatrix[maxElementCoordinate][i] == maxElement) {
                         numberCoordinates.add(new ArrayList<>());
                         numberCoordinates.get(numberCoordinates.size() - 1).add(maxElementCoordinate);
@@ -174,11 +192,13 @@ public final class Groups {
                         subgroups.add(i);
 
                     } else {
+                        // or just mark current cell as visited
                         quadraticMatrix[maxElementCoordinate][i] = 0;
                     }
                 }
             }
             // vertical lines i j
+            // and same staff here as I mentioned above
             for (int maxElementCoordinate : maxElementCoordinates) {
                 for (int i = quadraticMatrix.length - 1; quadraticMatrix[i][maxElementCoordinate] != -1; i--) {
                     if (quadraticMatrix[i][maxElementCoordinate] == maxElement) {
@@ -192,16 +212,23 @@ public final class Groups {
                     }
                 }
             }
-            for (int j = 0; numberCoordinates.size() != 0; ) {
-                maxElementCoordinates[0] = numberCoordinates.get(j).get(0);
-                maxElementCoordinates[1] = numberCoordinates.get(j).get(1);
+            // in this loop we check all cells, that we found on the previous iterations, with the same logic
+            // ATTENTION HERE can be wrong
+            while (maxElement > 0 && numberCoordinates.size() > 0) {
+//                for(int i = 0; i < quadraticMatrix.length; i++) {
+//                    System.out.println(Arrays.toString(quadraticMatrix[i]));
+//                }
+                maxElementCoordinates[0] = numberCoordinates.get(0).get(0);
+                maxElementCoordinates[1] = numberCoordinates.get(0).get(1);
                 maxElement = quadraticMatrix[maxElementCoordinates[0]][maxElementCoordinates[1]];
+                // mark as visited
                 quadraticMatrix[maxElementCoordinates[0]][maxElementCoordinates[1]] = 0;
-                numberCoordinates.remove(j);
+                numberCoordinates.remove(0);
                 // clear vertical and horizontal lines on maxElem[0] and maxElem[1]
                 // horizontal lines on i j
                 for (int maxElementCoordinate : maxElementCoordinates) {
                     for (int i = 0; quadraticMatrix[maxElementCoordinate][i] != -1; i++) {
+                        // found another cell with the max number -> we add it into the list
                         if (quadraticMatrix[maxElementCoordinate][i] == maxElement) {
                             numberCoordinates.add(new ArrayList<>());
                             numberCoordinates.get(numberCoordinates.size() - 1).add(maxElementCoordinate);
@@ -210,13 +237,16 @@ public final class Groups {
                             subgroups.add(i);
 
                         } else {
+                            // mark as visited
                             quadraticMatrix[maxElementCoordinate][i] = 0;
                         }
                     }
                 }
                 // vertical lines i j
+                // and here ...
                 for (int maxElementCoordinate : maxElementCoordinates) {
                     for (int i = quadraticMatrix.length - 1; quadraticMatrix[i][maxElementCoordinate] != -1; i--) {
+                        // found another cell with the max number -> we add it into the list
                         if (quadraticMatrix[i][maxElementCoordinate] == maxElement) {
                             numberCoordinates.add(new ArrayList<>());
                             numberCoordinates.get(numberCoordinates.size() - 1).add(i);
@@ -224,32 +254,35 @@ public final class Groups {
                             subgroups.add(i);
                             subgroups.add(maxElementCoordinate);
                         } else {
+                            // mark as visited
                             quadraticMatrix[i][maxElementCoordinate] = 0;
                         }
                     }
                 }
             }
-            groups.add(new ArrayList<>());
-            groups.get(groups.size() - 1).addAll(subgroups);
+            // In the end of the iteration we add all operations into the group
+            if (subgroups.size() != 0) {
+                groups.add(new ArrayList<>());
+                groups.get(groups.size() - 1).addAll(subgroups);
+            }
+            // then we check next maxElement
+            maxElementCoordinates = findMaxElementCoordinates(quadraticMatrix);
+            maxElement = quadraticMatrix[maxElementCoordinates[0]][maxElementCoordinates[1]];
         }
+        return addOperations(groups, quadraticMatrix.length);
     }
 
 
-    private static ArrayList<ArrayList<Integer>> addOperations(ArrayList<ArrayList<Integer>> groups) {
-        List<Integer> allGroups = new ArrayList<>();
+    private ArrayList<ArrayList<Integer>> addOperations(ArrayList<ArrayList<Integer>> groups, int maxElementsAmount) {
+        List<Integer> allGroups = new ArrayList<>(uniqueElements.size());
         for (ArrayList<Integer> group : groups) {
             allGroups.addAll(group);
         }
-        List<Integer> sortedGroups = allGroups.stream().sorted().collect(Collectors.toList());
-        int counter = 0;
-        for (int i = 0; i < sortedGroups.size(); i++) {
-
-            if (i != sortedGroups.get(counter)) {
+        for (int i = 0; i < maxElementsAmount; i++) {
+            if (!allGroups.contains(i)) {
                 groups.add(new ArrayList<>());
                 groups.get(groups.size() - 1).add(i);
-                counter--;
             }
-            counter++;
         }
         return groups;
     }

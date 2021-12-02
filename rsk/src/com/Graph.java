@@ -19,12 +19,12 @@ public class Graph {
      *      Additional methods to implement:
      *      I think I should implement method that
      */
-    private int[][] graph;
+    private final int[][] graph;
     private final ArrayList<String> uniqueElements;
 
     public Graph(ArrayList<String> uniqueElements, ArrayList<ArrayList<String>> elements,
                  ArrayList<Integer> group) {
-        this.uniqueElements = refineUniqueElementsForCurrentGroup(uniqueElements, group, elements);
+        this.uniqueElements = refineUniqueElementsForCurrentGroup(group, elements);
         graph = createGraph(this.uniqueElements,elements,group);
         printGraph();
         System.out.println();
@@ -44,8 +44,8 @@ public class Graph {
             System.out.println(Arrays.toString(ints));
         }
     }
-    private ArrayList<String> refineUniqueElementsForCurrentGroup(
-            ArrayList<String> uniqueElements, ArrayList<Integer> group, ArrayList<ArrayList<String>> elements) {
+    private ArrayList<String> refineUniqueElementsForCurrentGroup(ArrayList<Integer> group,
+                                                                  ArrayList<ArrayList<String>> elements) {
 
         ArrayList<String> updatedUniqueElements = new ArrayList<>();
         for (int i = 0; i < group.size(); i++) {

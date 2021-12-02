@@ -3,7 +3,6 @@ package rsk.src.com;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class MatrixContainer {
     private final ArrayList<String> uniqueElements;
@@ -25,8 +24,8 @@ public class MatrixContainer {
 
     public void printMatrix(int[][] matrix, String message) {
         System.out.println(message);
-        for (int i = 0; i < matrix.length; i++) {
-            System.out.println(Arrays.toString(matrix[i]));
+        for (int[] ints : matrix) {
+            System.out.println(Arrays.toString(ints));
         }
         System.out.println();
     }
@@ -85,12 +84,12 @@ public class MatrixContainer {
 
     }
 
-    private static ArrayList<String> findUniqueElements(ArrayList<ArrayList<String>> inputElems) {
+    private static ArrayList<String> findUniqueElements(ArrayList<ArrayList<String>> inputElements) {
         ArrayList<String> uniqueElements = new ArrayList<>();
-        for (int i = 0; i < inputElems.size(); i++) {
-            for (int j = 0; j < inputElems.get(i).size(); j++) {
-                if (!uniqueElements.contains(inputElems.get(i).get(j))) {
-                    uniqueElements.add(inputElems.get(i).get(j));
+        for (ArrayList<String> inputElemRow : inputElements) {
+            for (String element : inputElemRow) {
+                if (!uniqueElements.contains(element)) {
+                    uniqueElements.add(element);
                 }
             }
         }
