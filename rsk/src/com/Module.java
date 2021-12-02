@@ -3,6 +3,7 @@ package rsk.src.com;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+
 public class Module {
 
 
@@ -24,6 +25,7 @@ public class Module {
         this.graph = graph.getGraph();
         this.uniqueElements = graph.getUniqueElements();
         checkVertices();
+        System.out.println(getNeighbours(0));
     }
 
     // method that checks vertices on beginning and ending cases
@@ -81,9 +83,20 @@ public class Module {
 
 
     private void check_loop() {
+        // firstly we need to start from the start node and go deeper into the graph
+
 
     }
 
+    private ArrayList<Integer> getNeighbours(int vertex) {
+        ArrayList<Integer> neighbours = new ArrayList<>();
+        for (int i = 0; i < graph[vertex].length; i++) {
+            if (graph[vertex][i] == 1) {
+                neighbours.add(i);
+            }
+        }
+        return neighbours;
+    }
 
     private void check_chain() {
 

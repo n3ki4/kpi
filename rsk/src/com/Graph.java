@@ -27,7 +27,7 @@ public class Graph {
         this.uniqueElements = refineUniqueElementsForCurrentGroup(uniqueElements, group, elements);
         graph = createGraph(this.uniqueElements,elements,group);
         printGraph();
-
+        System.out.println();
     }
 
     public ArrayList<String> getUniqueElements() {

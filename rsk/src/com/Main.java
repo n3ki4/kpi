@@ -2,6 +2,7 @@ package rsk.src.com;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
 
 public class Main {
@@ -35,7 +36,8 @@ public class Main {
             line = console.nextLine();
             if (!line.equals("")) {
                 elementsFromUser.add(new ArrayList<>());
-                elementsFromUser.get(rowNum).addAll(Arrays.asList(line.split(",")));
+                elementsFromUser.get(rowNum).addAll(line.length() > 2 ?
+                        Arrays.asList(line.split(String.valueOf(line.charAt(2)))) : Collections.singleton(line));
                 rowNum++;
             }
         }

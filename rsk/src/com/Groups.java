@@ -108,11 +108,15 @@ public final class Groups {
 
     private static int[][] createGroupAdjacencyMatrix(ArrayList<ArrayList<Integer>> groups, int[][] adjacencyMatrix) {
         int[][] groupAdjacencyMatrix = new int[groups.size()][adjacencyMatrix[0].length];
+        int[] combinedGroup;
         for (int i = 0; i < groups.size(); i++) {
-            int[] combinedGroup = combineOperationsIntoGroup(groups.get(i), adjacencyMatrix);
-            for (int j = 0; j < groupAdjacencyMatrix[i].length; j++) {
-                groupAdjacencyMatrix[i][j] = combinedGroup[j];
+            if (groups.get(i).size() > 0) {
+                combinedGroup = combineOperationsIntoGroup(groups.get(i), adjacencyMatrix);
+                for (int j = 0; j < groupAdjacencyMatrix[i].length; j++) {
+                    groupAdjacencyMatrix[i][j] = combinedGroup[j];
+                }
             }
+
         }
         return groupAdjacencyMatrix;
     }
