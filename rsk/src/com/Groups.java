@@ -8,9 +8,6 @@ public final class Groups {
     private int[][] groupAdjacencyMatrix;
     private final ArrayList<String> uniqueElements;
 
-    // TODO: need to fix sortByOperationAmount method
-
-
     public Groups(MatrixContainer matrices) {
         this.uniqueElements = matrices.getUniqueElements();
         this.groups = divideByGroups(matrices.getQuadraticMatrix());
@@ -60,21 +57,7 @@ public final class Groups {
             }
         }
     }
-    // TODO fix this method (deletes some operations somehow)
-    /*
-    before sort
-        Groups
-        [5, 0]
-        [3, 1]
-        [4, 2]
-        [6]
-    after sort
-        Groups
-        [5, 0]
-        [3, 1]
-        [4, 2]
-        []
-     */
+
     private ArrayList<ArrayList<Integer>> sortByOperationAmount(int[][] groupAdjacencyMatrix) {
         ArrayList<ArrayList<Integer>> sortedGroups = new ArrayList<>(groups.size());
         int[][] groupMatrix = new int[groupAdjacencyMatrix.length][groupAdjacencyMatrix[0].length];
@@ -213,11 +196,7 @@ public final class Groups {
                 }
             }
             // in this loop we check all cells, that we found on the previous iterations, with the same logic
-            // ATTENTION HERE can be wrong
             while (maxElement > 0 && numberCoordinates.size() > 0) {
-//                for(int i = 0; i < quadraticMatrix.length; i++) {
-//                    System.out.println(Arrays.toString(quadraticMatrix[i]));
-//                }
                 maxElementCoordinates[0] = numberCoordinates.get(0).get(0);
                 maxElementCoordinates[1] = numberCoordinates.get(0).get(1);
                 maxElement = quadraticMatrix[maxElementCoordinates[0]][maxElementCoordinates[1]];
